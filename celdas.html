@@ -13,11 +13,102 @@
     </style>
 </head>
 <body>
-    <h2>Ejercicio 2</h2>
-    <table>
-        <tr>
-            <td style="background-color: red;"></td>
-        </tr>
-    </table>
+<h2>Ejercicio 2</h2>
+<p>Número de celdas: <span id="numCells"></span></p>
+<p id="buttons"></p>
+<table>
+    <!-- <tr>
+        <td style="background-color: red;"></td>
+    </tr> -->
+</table>
+<script>
+    const colors = ['red', 'yellow', 'green', 'blue'];
+    const tableDOM = document.querySelector('table');
+    const numCellsDOM = document.querySelector('#numCells');
+    const buttons = document.querySelector('#buttons');
+
+    let numCells = prompt("Ingrese el número de celdas por fila:");
+    numCellsDOM.textContent = numCells;
+
+    const insertRowButton = document.createElement('button');
+    insertRowButton.textContent = 'Insertar Fila';
+    buttons.appendChild(insertRowButton);
+
+    const startAutoRowButton = document.createElement('button');
+    startAutoRowButton.textContent = 'Iniciar fila automática';
+    buttons.appendChild(startAutoRowButton);
+
+    const stopButton = document.createElement('button');
+    stopButton.textContent = 'Parar';
+    stopButton.disabled = true;
+    buttons.appendChild(stopButton);
+
+    const insertColumnButton = document.createElement('button');
+    insertColumnButton.textContent = 'Insertar columna';
+    buttons.appendChild(insertColumnButton);
+
+    function getRandomColor() {
+        return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function insertRow() {
+        const row = document.createElement('tr');
+        for (let i = 0; i < numCells; i++) {
+            const cell = document.createElement('td');
+            cell.style.backgroundColor = getRandomColor();
+            row.appendChild(cell);
+        }
+        tableDOM.appendChild(row);
+    }
+
+    insertRowButton.addEventListener('click', insertRow);
+    
+    let autoRowInterval;
+    startAutoRowButton.addEventListener('click', () => {
+        autoRowInterval = setInterval(insertRow, 1000);
+        startAutoRowButton.disabled = true;
+        stopButton.disabled = false;
+    });
+    
+    stopButton.addEventListener('click', () => {
+        clearInterval(autoRowInterval);
+        startAutoRowButton.disabled = false;
+        stopButton.disabled = true;
+    });
+
+    function insertColumn() {
+        const rows = tableDOM.querySelectorAll('tr');
+        rows.forEach(row => {
+            const cell = document.createElement('td');
+            cell.style.backgroundColor = getRandomColor();
+            row.appendChild(cell);
+        });
+        numCells++;
+        numCellsDOM.textContent = numCells;
+    }
+
+    insertColumnButton.addEventListener('click', insertColumn);
+    
+    function changeColor(event) {
+        if (event.target.tagName === 'TD') {
+            const currentColor = event.target.style.backgroundColor;
+            const currentIndex = colors.indexOf(currentColor);
+            const nextIndex = (currentIndex + 1) % colors.length;
+            const color = colors[nextIndex];
+            event.target.style.backgroundColor = color;
+
+            const row = event.target.parentElement;
+            const cells = row.querySelectorAll('td');
+            const allSameColor = [...cells].every(cell => cell.style.backgroundColor === color);
+
+            if (allSameColor) {
+                row.remove();
+            }
+        }
+    }
+
+    tableDOM.addEventListener('click', changeColor);
+</script>
+
 </body>
 </html>
